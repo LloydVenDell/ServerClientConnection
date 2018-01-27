@@ -4,19 +4,19 @@
 // Website: Easycoding.tn      //
 /////////////////////////////////
 #include <ESP8266WiFi.h>
-
 String  i;
 WiFiServer server(80);
+#define LED D2
 
 void setup()
 {
-  i = "";
+  pinMode(LED, OUTPUT);
 
+  i = "";
   Serial.begin(9600);
-  pinMode(4, OUTPUT);
-    WiFi.disconnect();
+  WiFi.disconnect();
   delay(3000);
-   WiFi.begin("GALILEO","");
+  WiFi.begin("ETPIEvoAirmalupet","tarima1521");
   Serial.println("Connecting to Wifi");
   while ((!(WiFi.status() == WL_CONNECTED))){
     delay(300);
@@ -26,12 +26,11 @@ void setup()
     Serial.println((WiFi.localIP()));
     server.begin();
 
-
+    
 }
 
 
-void loop()
-{
+void loop(){
 
     WiFiClient client = server.available();
     if (!client) { return; }
@@ -39,31 +38,35 @@ void loop()
     i = (client.readStringUntil('\r'));
     i.remove(0, 5);
     i.remove(i.length()-9,9);
-    if (i == "ON") {
-      digitalWrite(4,HIGH);
+
+
+    client.println("HTTP/1.1 200 OK");
+    client.println("Content-Type: text/html");
+    client.println("");
+    client.println(analogRead(A0));
+    client.stop();
+    delay(1);
+ 
+  if (i == "ON") {
+      digitalWrite(LED,HIGH);
       client.println("HTTP/1.1 200 OK");
       client.println("Content-Type: text/html");
       client.println("");
-      client.println("<!DOCTYPE HTML>");
-      client.println("<html>");
       client.println("LED is ON");
-      client.println("</html>");
       client.stop();
       delay(1);
 
     }
     if (i == "OFF") {
-      digitalWrite(4,LOW);
+      digitalWrite(LED,LOW);
       client.println("HTTP/1.1 200 OK");
       client.println("Content-Type: text/html");
       client.println("");
-      client.println("<!DOCTYPE HTML>");
-      client.println("<html>");
       client.println("LED is OFF");
-      client.println("</html>");
       client.stop();
-      delay(1);
-
+      delay(1);   
     }
 
 }
+
+
